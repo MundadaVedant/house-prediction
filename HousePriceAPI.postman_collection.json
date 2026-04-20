@@ -1,0 +1,96 @@
+{
+  "info": {
+    "name": "House Price Prediction API",
+    "description": "Complete CRUD + Prediction API collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Health Check",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "http://127.0.0.1:5001/health" },
+        "description": "Check if the API is running"
+      }
+    },
+    {
+      "name": "2. Model Comparison",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "http://127.0.0.1:5001/model-comparison" },
+        "description": "Get all model metrics (MAE, RMSE, R2, CV_R2)"
+      }
+    },
+    {
+      "name": "3. Get Features",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "http://127.0.0.1:5001/features" },
+        "description": "Get list of model input features"
+      }
+    },
+    {
+      "name": "4. Predict Price",
+      "request": {
+        "method": "POST",
+        "url": { "raw": "http://127.0.0.1:5001/predict" },
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"bedrooms\": 3,\n  \"bathrooms\": 2,\n  \"sqft_living\": 1800,\n  \"sqft_lot\": 5000,\n  \"floors\": 2,\n  \"view\": 0,\n  \"condition\": 3,\n  \"yr_built\": 2000\n}"
+        },
+        "description": "Predict house price using ML model"
+      }
+    },
+    {
+      "name": "5. GET All Properties",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "http://127.0.0.1:5001/properties" },
+        "description": "Retrieve all saved property records"
+      }
+    },
+    {
+      "name": "6. GET Property by ID",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "http://127.0.0.1:5001/properties/1" },
+        "description": "Retrieve a single property by its ID"
+      }
+    },
+    {
+      "name": "7. POST Create Property",
+      "request": {
+        "method": "POST",
+        "url": { "raw": "http://127.0.0.1:5001/properties" },
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"bedrooms\": 3,\n  \"bathrooms\": 2,\n  \"sqft_living\": 1800,\n  \"sqft_lot\": 5000,\n  \"floors\": 2,\n  \"yr_built\": 2000,\n  \"condition\": 3,\n  \"view\": 1,\n  \"owner\": \"Rahul Sharma\",\n  \"location\": \"Mumbai\"\n}"
+        },
+        "description": "Create a new property record. Predicted price is auto-calculated."
+      }
+    },
+    {
+      "name": "8. PUT Update Property",
+      "request": {
+        "method": "PUT",
+        "url": { "raw": "http://127.0.0.1:5001/properties/1" },
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"bedrooms\": 4,\n  \"sqft_living\": 2200,\n  \"condition\": 4,\n  \"owner\": \"Priya Patel\"\n}"
+        },
+        "description": "Update an existing property. Price is recalculated automatically."
+      }
+    },
+    {
+      "name": "9. DELETE Property",
+      "request": {
+        "method": "DELETE",
+        "url": { "raw": "http://127.0.0.1:5001/properties/1" },
+        "description": "Delete a property record by ID"
+      }
+    }
+  ]
+}

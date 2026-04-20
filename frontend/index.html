@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>House Price Prediction System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=2" />
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-icon">🏠</div>
+      <div>
+        <h1 class="header-title">House Price Prediction System</h1>
+        <p class="header-sub">Predict property prices using Machine Learning</p>
+      </div>
+      <div class="header-right">
+        <!-- Dark mode toggle -->
+        <button class="theme-btn" id="themeBtn" title="Toggle dark mode">🌙</button>
+        <!-- API status -->
+        <div class="status-pill">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Checking...</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── MAIN ── -->
+  <main class="main">
+
+    <!-- Stats strip -->
+    <div class="stats-strip">
+      <div class="stat-item">
+        <span class="stat-num">5</span>
+        <span class="stat-label">ML Models</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="sR2">—</span>
+        <span class="stat-label">Best R²</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="sMAE">—</span>
+        <span class="stat-label">Best MAE</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="sPredCount">0</span>
+        <span class="stat-label">Predictions Made</span>
+      </div>
+    </div>
+
+    <div class="layout">
+
+      <!-- ── LEFT: FORM ── -->
+      <div class="card form-card">
+        <div class="card-head">
+          <span class="card-icon">📋</span>
+          <span>Property Details</span>
+        </div>
+
+        <!-- Quick-fill presets -->
+        <div class="presets">
+          <span class="preset-label">Quick Fill:</span>
+          <button class="preset-btn" onclick="fillPreset('starter')">🏡 Starter</button>
+          <button class="preset-btn" onclick="fillPreset('family')">🏘 Family</button>
+          <button class="preset-btn" onclick="fillPreset('luxury')">🏰 Luxury</button>
+        </div>
+
+        <form id="predForm" novalidate>
+
+          <div class="form-row two-col">
+            <div class="field">
+              <label for="sqft_living">Living Area <span class="unit">(sq ft)</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">📐</span>
+                <input type="number" id="sqft_living" placeholder="e.g. 1800" min="200" max="15000" />
+              </div>
+              <span class="err" id="e-sqft_living">Enter 200 – 15,000</span>
+            </div>
+            <div class="field">
+              <label for="sqft_lot">Lot Size <span class="unit">(sq ft)</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">🌿</span>
+                <input type="number" id="sqft_lot" placeholder="e.g. 5000" min="500" max="100000" />
+              </div>
+              <span class="err" id="e-sqft_lot">Enter 500 – 100,000</span>
+            </div>
+          </div>
+
+          <div class="form-row two-col">
+            <div class="field">
+              <label for="bedrooms">Bedrooms</label>
+              <div class="input-wrap">
+                <span class="input-icon">🛏️</span>
+                <input type="number" id="bedrooms" placeholder="e.g. 3" min="1" max="10" />
+              </div>
+              <span class="err" id="e-bedrooms">Enter 1 – 10</span>
+            </div>
+            <div class="field">
+              <label for="bathrooms">Bathrooms</label>
+              <div class="input-wrap">
+                <span class="input-icon">🚿</span>
+                <input type="number" id="bathrooms" placeholder="e.g. 2" min="1" max="6" />
+              </div>
+              <span class="err" id="e-bathrooms">Enter 1 – 6</span>
+            </div>
+          </div>
+
+          <div class="form-row two-col">
+            <div class="field">
+              <label for="floors">Floors</label>
+              <div class="input-wrap select-wrap">
+                <span class="input-icon">🏢</span>
+                <select id="floors">
+                  <option value="">Select floors</option>
+                  <option value="1">1 Floor</option>
+                  <option value="2">2 Floors</option>
+                  <option value="3">3 Floors</option>
+                  <option value="4">4 Floors</option>
+                  <option value="5">5 Floors</option>
+                  <option value="6">6 Floors</option>
+                </select>
+              </div>
+              <span class="err" id="e-floors">Please select floors</span>
+            </div>
+            <div class="field">
+              <label for="yr_built">Year Built</label>
+              <div class="input-wrap">
+                <span class="input-icon">📅</span>
+                <input type="number" id="yr_built" placeholder="e.g. 2000" min="1900" max="2024" />
+              </div>
+              <span class="err" id="e-yr_built">Enter 1900 – 2024</span>
+            </div>
+          </div>
+
+          <div class="form-row two-col">
+            <div class="field">
+              <label for="condition">Condition</label>
+              <div class="input-wrap select-wrap">
+                <span class="input-icon">🔧</span>
+                <select id="condition">
+                  <option value="">Select condition</option>
+                  <option value="1">1 – Poor</option>
+                  <option value="2">2 – Fair</option>
+                  <option value="3">3 – Average</option>
+                  <option value="4">4 – Good</option>
+                  <option value="5">5 – Excellent</option>
+                </select>
+              </div>
+              <span class="err" id="e-condition">Please select condition</span>
+            </div>
+            <div class="field">
+              <label for="view">View Quality</label>
+              <div class="input-wrap select-wrap">
+                <span class="input-icon">🌄</span>
+                <select id="view">
+                  <option value="0">0 – No View</option>
+                  <option value="1">1 – Fair</option>
+                  <option value="2">2 – Average</option>
+                  <option value="3">3 – Good</option>
+                  <option value="4">4 – Excellent</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="location">City / Location</label>
+              <div class="input-wrap select-wrap">
+                <span class="input-icon">📍</span>
+                <select id="pred-location">
+                  <option value="">Select city</option>
+                  <option value="Mumbai">Mumbai</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Bangalore">Bangalore</option>
+                  <option value="Hyderabad">Hyderabad</option>
+                  <option value="Chennai">Chennai</option>
+                  <option value="Pune">Pune</option>
+                  <option value="Kolkata">Kolkata</option>
+                  <option value="Ahmedabad">Ahmedabad</option>
+                  <option value="Jaipur">Jaipur</option>
+                  <option value="Lucknow">Lucknow</option>
+                </select>
+              </div>
+              <span class="err" id="e-pred-location">Please select a city</span>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn btn-primary" id="predictBtn">
+              🔮 Predict Price
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="resetForm()">
+              ↺ Reset
+            </button>
+          </div>
+        </form>
+
+        <!-- ── RESULT ── -->
+        <div id="resultBox" class="result-box hidden">
+          <div class="result-label">Estimated Market Price</div>
+          <div class="result-price" id="priceDisplay">₹0</div>
+          <div class="result-range" id="priceRange"></div>
+          <div class="result-tag" id="priceTag"></div>
+
+          <!-- Price Gauge -->
+          <div class="gauge-wrap">
+            <div class="gauge">
+              <div class="gauge-fill" id="gaugeFill"></div>
+              <div class="gauge-needle" id="gaugeNeedle"></div>
+            </div>
+            <div class="gauge-labels">
+              <span>Budget</span><span>Mid</span><span>Luxury</span>
+            </div>
+          </div>
+
+          <div class="result-note">Predicted by Tuned Random Forest · R² = 0.905</div>
+          <div class="result-btn-row">
+            <button class="btn btn-primary save-btn" onclick="openSaveForm()">💾 Save Property</button>
+            <button class="btn btn-compare" id="addCompareBtn" onclick="addToCompare()">📊 Add to Compare</button>
+          </div>
+        </div>
+
+        <!-- ── BREAKDOWN ── -->
+        <div id="breakdownBox" class="breakdown-box hidden">
+          <div class="breakdown-title">📊 Feature Breakdown</div>
+          <div class="breakdown-grid" id="breakdownGrid"></div>
+        </div>
+
+        <!-- ── AFFORDABILITY ── -->
+        <div id="affordBox" class="afford-box hidden">
+          <div class="afford-title">💰 Affordability Calculator</div>
+          <div class="afford-row">
+            <div class="afford-field">
+              <label>Down Payment (%)</label>
+              <input type="number" id="downPct" value="20" min="5" max="50" oninput="calcMortgage()" />
+            </div>
+            <div class="afford-field">
+              <label>Interest Rate (%)</label>
+              <input type="number" id="interestRate" value="7" min="1" max="20" step="0.1" oninput="calcMortgage()" />
+            </div>
+            <div class="afford-field">
+              <label>Loan Term (yrs)</label>
+              <input type="number" id="loanTerm" value="30" min="5" max="30" oninput="calcMortgage()" />
+            </div>
+          </div>
+          <div class="afford-result" id="affordResult"></div>
+        </div>
+
+        <!-- ── ERROR ── -->
+        <div id="errorBox" class="error-box hidden"></div>
+      </div>
+
+      <!-- ── RIGHT PANEL ── -->
+      <div class="right-panel">
+
+        <!-- Model Comparison -->
+        <div class="card compare-card">
+          <div class="card-head">
+            <span class="card-icon">📈</span>
+            <span>Model Comparison</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>#</th><th>Model</th><th>MAE</th><th>R²</th><th>CV R²</th><th>Rank</th></tr>
+              </thead>
+              <tbody id="compBody">
+                <tr><td colspan="6" class="tbl-loading">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="chart-wrap" style="margin-top:12px;">
+            <canvas id="modelChart" height="120"></canvas>
+          </div>
+        </div>
+
+        <!-- Prediction History -->
+        <div class="card history-card" id="historyCard" style="display:none">
+          <div class="card-head">
+            <span class="card-icon">🕓</span>
+            <span>Recent Predictions</span>
+            <button class="clear-btn" onclick="clearHistory()">Clear</button>
+          </div>
+          <!-- Mini bar chart -->
+          <div class="mini-chart" id="miniChart"></div>
+          <div class="chart-wrap">
+            <canvas id="historyChart" height="72"></canvas>
+          </div>
+          <ul class="history-list" id="historyList"></ul>
+        </div>
+
+        <!-- Saved Properties moved into right panel -->
+        <div class="card saved-section">
+          <div class="card-head">
+            <span class="card-icon">🏡</span>
+            <span>Saved Properties</span>
+            <span class="saved-count" id="savedCount">0 saved</span>
+          </div>
+
+          <!-- Save form -->
+          <div class="save-form" id="saveForm" style="display:none">
+            <div class="save-form-row">
+              <div class="save-field">
+                <label>Owner Name</label>
+                <input type="text" id="ownerName" placeholder="e.g. Rahul Sharma" />
+              </div>
+              <div class="save-field">
+                <label>Location</label>
+                <input type="text" id="location" placeholder="e.g. Mumbai" />
+              </div>
+              <div class="save-field">
+                <label>Property Label</label>
+                <input type="text" id="propLabel" placeholder="e.g. My Dream Home" />
+              </div>
+              <button class="btn btn-primary save-confirm-btn" onclick="confirmSave()">💾 Save Property</button>
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div class="saved-empty" id="savedEmpty">
+            <div class="empty-icon">🏠</div>
+            <p>No saved properties yet.</p>
+            <p class="empty-sub">Predict a price and click “Save Property” to add it here.</p>
+          </div>
+
+          <!-- Property cards grid -->
+          <div class="prop-grid" id="propGrid"></div>
+        </div>
+
+        </div><!-- /right-panel -->
+
+    </div><!-- /layout -->
+
+    <!-- Saved Properties moved into right panel -->
+
+    <!-- Edit Modal -->
+    <div class="modal-overlay hidden" id="editModal">
+      <div class="modal">
+        <div class="modal-head">
+          <span>✏️ Edit Property</span>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-row">
+            <div class="save-field"><label>Owner Name</label><input type="text" id="edit-owner" /></div>
+            <div class="save-field"><label>Location</label><input type="text" id="edit-location" /></div>
+          </div>
+          <div class="modal-row">
+            <div class="save-field"><label>Property Label</label><input type="text" id="edit-label" /></div>
+            <div class="save-field"><label>Bedrooms</label><input type="number" id="edit-bedrooms" min="1" max="10" /></div>
+          </div>
+          <div class="modal-row">
+            <div class="save-field"><label>Bathrooms</label><input type="number" id="edit-bathrooms" min="1" max="6" /></div>
+            <div class="save-field"><label>Living Area (sqft)</label><input type="number" id="edit-sqft" /></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" onclick="saveEdit()">✓ Update</button>
+          <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+
+
+  <!-- Loading overlay -->
+  <div class="overlay hidden" id="overlay">
+    <div class="spinner-wrap">
+      <div class="spinner"></div>
+      <p>Predicting price...</p>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast hidden" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
